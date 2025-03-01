@@ -3,11 +3,9 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { RegisterSchemaType } from '../schemes';
 import { api, RegisterResponse } from '@/shared/api';
-// import { useStore } from '@/shared/store';
 
 export function useRegister() {
     const router = useRouter();
-    // const { setAuthorized } = useStore();
 
     return useMutation({
         mutationFn: async (data: RegisterSchemaType) => {
@@ -27,9 +25,8 @@ export function useRegister() {
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('refresh_token', data.refresh_token);
 
-            // setAuthorized(true);
             toast.success('Регистрация успешна!');
-            router.push('/profile');
+            router.push('/');
         },
         onError: () => {
             toast.error('Ошибка регистрации. Попробуйте снова.');

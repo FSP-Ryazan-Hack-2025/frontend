@@ -1,12 +1,14 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, ComponentType } from 'react';
+import { useEffect } from 'react';
 import { api } from '@/shared/api';
 import { User } from '@/entities/user/model';
 import { useStore } from '../store';
 
-export function withAuth<P extends object>(WrappedComponent: ComponentType<P>) {
+export function withAuth<P extends object>(
+    WrappedComponent: React.ComponentType<P>
+) {
     return function ProtectedComponent(props: P) {
         const router = useRouter();
         const pathName = usePathname();
@@ -24,11 +26,11 @@ export function withAuth<P extends object>(WrappedComponent: ComponentType<P>) {
                 }
 
                 try {
-                    if (authorized) return;
-                    const user = await api.get<User>('/user/self');
-
-                    setUserData(user.data);
-                    setAuthorized(true);
+                    if (!authorized) {
+                        const { data } = await api.get<User>('/user/self');
+                        setUserData(data);
+                        setAuthorized(true);
+                    }
                 } catch (error) {
                     console.log('Ошибка проверки токена:', error);
 
@@ -39,9 +41,9 @@ export function withAuth<P extends object>(WrappedComponent: ComponentType<P>) {
             };
 
             checkAuth();
-        }, []);
+        }, [authorized, pathName, router, setUserData, setAuthorized]);
 
-        if (!authorized) return null;
+        if (!authorized && pathName !== '/') return null;
 
         return <WrappedComponent {...props} />;
     };

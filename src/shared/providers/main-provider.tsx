@@ -10,9 +10,9 @@ export function MainProvider({ children }: PropsWithChildren<unknown>) {
         <TanstackQueryProvider>
             <ThemeProvider
                 attribute='class'
-                defaultTheme='light'
+                defaultTheme='system'
+                enableSystem
                 disableTransitionOnChange
-                storageKey='test-theme'
             >
                 <ToastProvider />
                 {children}

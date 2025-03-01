@@ -1,19 +1,11 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
+import { Inter } from 'next/font/google';
+import '@/shared/styles/globals.css';
 import { MainProvider } from '@/shared/providers';
 import { Container } from '@/shared/ui';
 import { Header } from '@/widgets/header';
 
-const geistSans = Geist({
-    variable: '--font-geist-sans',
-    subsets: ['latin']
-});
-
-const geistMono = Geist_Mono({
-    variable: '--font-geist-mono',
-    subsets: ['latin']
-});
+const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata: Metadata = {
     title: '',
@@ -26,14 +18,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang='en' suppressHydrationWarning>
-            <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
+        <html lang='ru' suppressHydrationWarning>
+            <body className={`${inter.className} antialiased`}>
                 <MainProvider>
                     <Container>
                         <Header />
-                        {children}
+                        <main className='flex-1'>{children}</main>
                     </Container>
                 </MainProvider>
             </body>
