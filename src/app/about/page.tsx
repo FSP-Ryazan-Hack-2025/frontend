@@ -3,7 +3,18 @@
 import type React from "react"
 import { useEffect, useRef } from "react"
 import { motion, useAnimation, useInView } from "framer-motion"
-import { Mail, Phone, MapPin } from "lucide-react"
+import {
+  Mail,
+  Phone,
+  MapPin,
+  BadgeCheck,
+  BriefcaseBusiness,
+  LaptopMinimalIcon as LaptopMinimalCheck,
+  ShieldCheck,
+  Tablet,
+  TvIcon as TvMinimal,
+} from "lucide-react"
+import { Card, CardContent } from "@/shared/ui"
 
 const technologies = [
   {
@@ -55,6 +66,44 @@ const technologies = [
         description: "Современный и высокопроизводительный фреймворк для создания API на Python",
       },
     ],
+  },
+]
+
+const projectFeatures = [
+  {
+    title: "Официальное подтверждение статуса продавца",
+    description:
+      "Каждый продавец проходит проверку, что гарантирует легальность и прозрачность всех сделок. Покупатели могут быть уверены в надежности партнеров.",
+    icon: <BadgeCheck className="h-8 w-8 text-primary" />,
+  },
+  {
+    title: "Удобный и интуитивно понятный интерфейс",
+    description:
+      "Простота использования, как на популярных маркетплейсах, делает процесс продажи и покупки легким и приятным.",
+    icon: <TvMinimal className="h-8 w-8 text-primary" />,
+  },
+  {
+    title: "Поддержка для самозанятых, ИП и малого бизнеса",
+    description:
+      "Мы создаем условия, которые помогают предпринимателям сосредоточиться на развитии бизнеса, а не на бюрократии.",
+    icon: <BriefcaseBusiness className="h-8 w-8 text-primary" />,
+  },
+  {
+    title: "Безопасность и прозрачность",
+    description:
+      "Все сделки защищены, а данные пользователей надежно хранятся. Мы заботимся о вашей конфиденциальности и безопасности.",
+    icon: <ShieldCheck className="h-8 w-8 text-primary" />,
+  },
+  {
+    title: "Мобильность и доступность",
+    description:
+      "Платформа доступна с любого устройства, чтобы вы могли управля��ь своим бизнесом и совершать покупки в любое время и в любом месте.",
+    icon: <Tablet className="h-8 w-8 text-primary" />,
+  },
+  {
+    title: "Поддержка 24/7",
+    description: "Наша команда всегда готова помочь вам с любыми вопросами и решить возникающие проблемы.",
+    icon: <LaptopMinimalCheck className="h-8 w-8 text-primary" />,
   },
 ]
 
@@ -112,7 +161,7 @@ const AnimatedSection = ({
 }) => {
   const controls = useAnimation()
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true})
+  const isInView = useInView(ref, { once: true })
 
   useEffect(() => {
     if (isInView) {
@@ -138,119 +187,60 @@ const AnimatedSection = ({
 }
 
 export default function About() {
+  const controls = useAnimation()
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, amount: 0.3 })
+
+  useEffect(() => {
+    if (isInView) {
+      controls.start("visible")
+    }
+  }, [controls, isInView])
+
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      {/* Проблема и Решение */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <AnimatedSection>
-            <h1 className="mb-8 text-center text-4xl font-bold">Проблема и Решение</h1>
-          </AnimatedSection>
+      {/* Секция с особенностями проекта */}
+      <section id="features" className="w-full bg-muted/50 py-12 md:py-24">
+        <div className="container px-4 md:px-6">
+          <motion.div
+            className="flex flex-col items-center justify-center space-y-4 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Особенности нашего проекта</h2>
+              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
+                Мы создаем платформу, которая делает жизнь проще, а бизнес — успешнее
+              </p>
+            </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <AnimatedSection delay={0.1} className="p-6 rounded-lg border border-blue-500 dark:border-white">
-              <h2 className="mb-6 text-2xl font-semibold">Проблема:</h2>
-              <div className="relative border-l-2 border-blue-500 dark:border-white pl-6">
-                <div className="mb-4">
-                  <p className="mb-2">
-                    Самозанятые, ИП и малый бизнес сталкиваются с трудностями в продвижении своих товаров и услуг на локальном рынке. 
-                    Отсутствие доступных и эффективных инструментов делает их продукты менее заметными для потенциальных клиентов.
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">
-                    Популярные платформы, такие как Авито, не обеспечивают официального подтверждения статуса продавца, что снижает 
-                    доверие покупателей и увеличивает риски нелегальных сделок.
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">
-                  Крупные маркетплейсы, например, Wildberries, предлагают сложные условия для входа и высокие комиссии, что делает 
-                их недоступными для большинства малых предприятий и самозанятых.
-                  </p>
-                </div>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={0.2} className="p-6 rounded-lg border border-blue-500 dark:border-white">
-              <h2 className="mb-6 text-2xl font-semibold">Решение:</h2>
-              <div className="relative border-l-2 border-blue-500 dark:border-white pl-6">
-                <div className="mb-4">
-                  <p className="mb-2">
-                    Мы создаем специализированное приложение для самозанятых, ИП и ООО, которое сочетает в себе удобство популярных 
-                    маркетплейсов, таких как Авито, с официальным подтверждением статуса предпринимателя.
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">
-                    Это решение обеспечит покупателям уверенность в легальности сделок, защиту их прав, 
-                    а продавцам — простой и доступный способ продвижения своих товаров и услуг без лишних сложностей.
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">
-                    Ожидаемый результат: Укрепление местной экономики, рост продаж для малого бизнеса и удобный доступ к качественным 
-                    товарам и услугам для покупателей.
-                  </p>
-                </div>
-              </div>
-            </AnimatedSection>
-          </div>
-        </div>
-      </section>
-
-      {/* Преимущества */}
-      <section className="py-12 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <AnimatedSection>
-            <h1 className="mb-8 text-center text-4xl font-bold">Преимущества нашего решения</h1>
-          </AnimatedSection>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <AnimatedSection delay={0.1} className="p-6 rounded-lg border border-blue-500 dark:border-white">
-              <h2 className="mb-6 text-2xl font-semibold text-center">Бизнес</h2>
-              <div className="relative border-l-2 border-blue-500 dark:border-white pl-6">
-                <div className="mb-4">
-                  <p className="mb-2">Расширение рынка сбыта для местных производителей.</p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">Увеличение узнаваемости брендов.</p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">Создание новых рабочих мест.</p>
-                </div>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={0.2} className="p-6 rounded-lg border border-blue-500 dark:border-white">
-              <h2 className="mb-6 text-2xl font-semibold text-center">Жители</h2>
-              <div className="relative border-l-2 border-blue-500 dark:border-white pl-6">
-                <div className="mb-4">
-                  <p className="mb-2">Удобный доступ к широкому ассортименту товаров.</p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">Безопасные транзакции с использованием современных технологий.</p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">Возможность оценки и отзыва о товарах и услугах.</p>
-                </div>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={0.3} className="p-6 rounded-lg border border-blue-500 dark:border-white">
-              <h2 className="mb-6 text-2xl font-semibold text-center">Регион</h2>
-              <div className="relative border-l-2 border-blue-500 dark:border-white pl-6">
-                <div className="mb-4">
-                  <p className="mb-2">Развитие цифровой экономики региона.</p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">Анализ данных для дальнейшего развития платформы.</p>
-                </div>
-                <div className="mb-4">
-                  <p className="mb-2">Повышение инвестиционной привлекательности.</p>
-                </div>
-              </div>
-            </AnimatedSection>
+          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2" ref={ref}>
+            {projectFeatures.map((feature, index) => (
+              <motion.div
+                key={index}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                initial="hidden"
+                animate={controls}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.2,
+                }}
+              >
+                <Card className="h-full transition-all hover:shadow-lg">
+                  <CardContent className="flex h-full flex-col p-6">
+                    <div className="mb-4">{feature.icon}</div>
+                    <h3 className="mb-2 text-xl font-bold">{feature.title}</h3>
+                    <p className="flex-grow text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
