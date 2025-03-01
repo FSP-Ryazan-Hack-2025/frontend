@@ -2,8 +2,8 @@ export interface User {
     id: number;
     name: string;
     surname: string;
+    patronymic: string;
     email: string;
-    gender: Gender;
 }
 
 export type Gender = 'male' | 'female';

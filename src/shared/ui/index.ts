@@ -13,3 +13,5 @@ export * from './avatar';
 export * from './alert-dialog';
 export * from './tabs';
 export * from './user-avatar';
+export * from './dialog';
+export * from './input-otp';

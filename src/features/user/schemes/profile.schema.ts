@@ -7,8 +7,8 @@ export const profileSchema = z.object({
     surname: z.string().min(1, {
         message: 'Введите фамилию'
     }),
-    gender: z.enum(['male', 'female'], {
-        message: 'Некорректный пол'
+    patronymic: z.string().min(1, {
+        message: 'Введите отчество'
     })
 });
 

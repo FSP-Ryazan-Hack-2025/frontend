@@ -6,13 +6,7 @@ import {
     FormField,
     FormItem,
     FormControl,
-    FormMessage,
-    FormLabel,
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem
+    FormMessage
 } from '@/shared/ui';
 import {
     Button,
@@ -29,7 +23,7 @@ import { profileSchema, UpdateProfileSchemaType } from '../schemes';
 export function ProfileForm() {
     const form = useForm<UpdateProfileSchemaType>({
         resolver: zodResolver(profileSchema),
-        defaultValues: { name: '', surname: '', gender: 'male' }
+        defaultValues: { name: '', surname: '', patronymic: '' }
     });
     const { mutate, isPending } = useUpdateProfile();
 
@@ -74,29 +68,13 @@ export function ProfileForm() {
                         />
                         <FormField
                             control={form.control}
-                            name='gender'
+                            name='patronymic'
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Пол</FormLabel>
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        disabled={isPending}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder='Выберите пол' />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value='male'>
-                                                Мужской
-                                            </SelectItem>
-                                            <SelectItem value='female'>
-                                                Женский
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Label>Отчество</Label>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
