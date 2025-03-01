@@ -1,6 +1,5 @@
 'use client';
 
-import { EditAvatar } from '@/features/avatar/components';
 import { Logout } from '@/features/logout/components';
 import { ProfileTabs } from '@/features/user/components';
 import { withAuth } from '@/shared/hoc';
@@ -18,7 +17,6 @@ function Profile() {
 
             <div className='mb-8 flex flex-col gap-6 md:flex-row'>
                 <Card className='flex w-full flex-col items-center p-6 md:w-64'>
-                    <EditAvatar userData={userData} />
                     <h2 className='text-xl font-semibold'>
                         {userData.name} {userData.surname}
                     </h2>

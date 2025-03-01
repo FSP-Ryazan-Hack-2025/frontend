@@ -1,6 +1,5 @@
 'use client';
 
-import { UserAvatar } from '@/features/avatar/components';
 import { useStore } from '@/shared/store';
 import {
     Button,
@@ -9,7 +8,8 @@ import {
     SheetContent,
     SheetTitle,
     SheetTrigger,
-    ToggleTheme
+    ToggleTheme,
+    UserAvatar
 } from '@/shared/ui';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';

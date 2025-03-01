@@ -1,13 +1,17 @@
 import { z } from 'zod';
 
-export const passwordSchema = z
+export const PasswordSchema = z
     .object({
-        new_password: z.string().min(6, 'Минимальная длина 6 символов'),
-        confirm_password: z.string()
+        new_password: z.string().min(6, {
+            message: 'Пароль минимум 6 символов'
+        }),
+        confirm_password: z.string().min(6, {
+            message: 'Пароль подтверждения минимум 6 символов'
+        })
     })
     .refine(data => data.new_password === data.confirm_password, {
         message: 'Пароли не совпадают',
-        path: ['confirmPassword']
+        path: ['confirm_password']
     });
 
-export type UpdatePasswordSchemaType = z.infer<typeof passwordSchema>;
+export type UpdatePasswordSchemaType = z.infer<typeof PasswordSchema>;

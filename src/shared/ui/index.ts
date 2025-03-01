@@ -12,3 +12,4 @@ export * from './sheet';
 export * from './avatar';
 export * from './alert-dialog';
 export * from './tabs';
+export * from './user-avatar';

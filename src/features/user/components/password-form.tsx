@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { passwordSchema } from '../schemes';
 import { useUpdatePassword } from '../hooks/use-update-password';
 import {
     Button,
@@ -17,11 +16,11 @@ import {
     Input,
     Label
 } from '@/shared/ui';
-import { UpdatePasswordSchemaType } from '../schemes';
+import { PasswordSchema, UpdatePasswordSchemaType } from '../schemes';
 
 export function PasswordForm() {
     const form = useForm<UpdatePasswordSchemaType>({
-        resolver: zodResolver(passwordSchema),
+        resolver: zodResolver(PasswordSchema),
         defaultValues: { new_password: '', confirm_password: '' }
     });
     const { mutate, isPending } = useUpdatePassword();
