@@ -3,7 +3,7 @@
 import { withAuth } from '@/shared/hoc';
 import { Button, Card, CardContent } from '@/shared/ui';
 import { motion, useAnimation, useInView } from 'framer-motion';
-import { ArrowRight, Code, Globe, Heart } from 'lucide-react';
+import { ArrowRight, BadgeCheck, BriefcaseBusiness, LaptopMinimalCheck, ShieldCheck, Tablet, TvMinimal } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
@@ -20,22 +20,40 @@ function Home() {
 
     const projectFeatures = [
         {
-            title: 'Социальное воздействие',
+            title: 'Официальное подтверждение статуса продавца',
             description:
-                'Наш проект направлен на решение важных общественных проблем и улучшение качества жизни людей.',
-            icon: <Heart className='h-8 w-8 text-primary' />
+                'Каждый продавец проходит проверку, что гарантирует легальность и прозрачность всех сделок. Покупатели могут быть уверены в надежности партнеров.',
+            icon: <BadgeCheck className='h-8 w-8 text-primary' />
         },
         {
-            title: 'Открытость и доступность',
+            title: 'Удобный и интуитивно понятный интерфейс',
             description:
-                'Наша платформа разработана с учетом потребностей всех пользователей, обеспечивая легкий доступ к информации.',
-            icon: <Globe className='h-8 w-8 text-primary' />
+                'Простота использования, как на популярных маркетплейсах, делает процесс продажи и покупки легким и приятным.',
+            icon: <TvMinimal className='h-8 w-8 text-primary' />
         },
         {
-            title: 'Современные технологии',
+            title: 'Поддержка для самозанятых, ИП и малого бизнеса',
             description:
-                'Проект построен на передовом стеке технологий, обеспечивая высокую производительность и масштабируемость.',
-            icon: <Code className='h-8 w-8 text-primary' />
+                'Мы создаем условия, которые помогают предпринимателям сосредоточиться на развитии бизнеса, а не на бюрократии.',
+            icon: <BriefcaseBusiness className='h-8 w-8 text-primary' />
+        },
+        {
+            title: 'Безопасность и прозрачность',
+            description:
+                'Все сделки защищены, а данные пользователей надежно хранятся. Мы заботимся о вашей конфиденциальности и безопасности.',
+            icon: <ShieldCheck  className='h-8 w-8 text-primary' />
+        },
+        {
+            title: 'Мобильность и доступность',
+            description:
+                'Платформа доступна с любого устройства, чтобы вы могли управлять своим бизнесом и совершать покупки в любое время и в любом месте.',
+            icon: <Tablet className='h-8 w-8 text-primary' />
+        },
+        {
+            title: 'Поддержка 24/7',
+            description:
+                'Наша команда всегда готова помочь вам с любыми вопросами и решить возникающие проблемы.',
+            icon: <LaptopMinimalCheck className='h-8 w-8 text-primary' />
         }
     ];
 
@@ -51,11 +69,11 @@ function Home() {
                             transition={{ duration: 0.5 }}
                         >
                             <h1 className='text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none'>
-                                Инновационное решение для общества
+                                Создано для предпринимателей: простой способ продавать и покупать с уверенностью
                             </h1>
                             <p className='mx-auto max-w-[700px] text-muted-foreground md:text-xl'>
-                                Мы создаем технологии, которые делают жизнь
-                                людей лучше и решают важные социальные задачи.
+                                Мы создаем платформу, которая меняет правила игры для самозанятых, 
+                                индивидуальных предпринимателей и малого бизнеса.
                             </p>
                         </motion.div>
                         <motion.div
@@ -98,8 +116,8 @@ function Home() {
                                 Особенности нашего проекта
                             </h2>
                             <p className='mx-auto max-w-[700px] text-muted-foreground md:text-xl'>
-                                Мы стремимся создать платформу, которая
-                                действительно меняет жизнь к лучшему.
+                                Мы создаем платформу, которая делает жизнь 
+                                проще, а бизнес — успешнее
                             </p>
                         </div>
                     </motion.div>
@@ -155,10 +173,10 @@ function Home() {
                             О нашем проекте
                         </h2>
                         <p className='mx-auto max-w-[700px] text-muted-foreground md:text-xl'>
-                            Мы стремимся создать платформу, которая объединяет
-                            людей и ресурсы для решения важных социальных задач.
-                            Наша цель - сделать информацию доступной, а
-                            взаимодействие - простым и эффективным.
+                            Мы создаем уникальную платформу, которая станет надежным помощником 
+                            для самозанятых, индивидуальных предпринимателей и малого бизнеса. 
+                            Наше приложение объединяет в себе удобство популярных маркетплейсов, таких как 
+                            Авито, с официальным подтверждением статуса предпринимателя.
                         </p>
                         <Button asChild>
                             <Link href='/about'>Узнать больше о нас</Link>
@@ -180,8 +198,7 @@ function Home() {
                         Присоединяйтесь к нам
                     </h2>
                     <p className='mx-auto mb-6 max-w-[700px] text-primary-foreground/80 md:text-xl'>
-                        Вместе мы можем сделать мир лучше. Ваш вклад имеет
-                        значение.
+                        Вместе мы сможем внести вклад в развитие Рязанской области
                     </p>
                     <Button size='lg' variant='secondary' asChild>
                         <Link href='/sign-up'>Стать частью проекта</Link>
