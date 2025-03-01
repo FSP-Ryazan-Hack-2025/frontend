@@ -8,16 +8,12 @@ export function useRegister() {
     const router = useRouter();
 
     return useMutation({
-        mutationFn: async (data: RegisterSchemaType) => {
+        mutationFn: async (
+            data: Omit<RegisterSchemaType, 'passwordRepeat'>
+        ) => {
             const response = await api.post<RegisterResponse>(
                 '/user/register',
-                {
-                    name: data.name,
-                    surname: data.surname,
-                    email: data.email,
-                    gender: data.gender,
-                    password: data.password
-                }
+                data
             );
             return response.data;
         },

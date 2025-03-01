@@ -10,11 +10,7 @@ export function useUpdateProfile() {
 
     return useMutation({
         mutationFn: async (data: UpdateProfileSchemaType) => {
-            const response = await api.put<User>('/user/edit', {
-                name: data.name,
-                surname: data.surname,
-                gender: data.gender
-            });
+            const response = await api.put<User>('/user/edit', data);
             return response.data;
         },
         onSuccess: data => {
