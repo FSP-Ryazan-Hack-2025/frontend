@@ -15,3 +15,7 @@ export * from './tabs';
 export * from './user-avatar';
 export * from './dialog';
 export * from './input-otp';
+export * from './slider'
+export * from './separator'
+export * from './badge'
+export * from './switch'

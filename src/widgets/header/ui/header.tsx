@@ -14,6 +14,7 @@ import {
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { SearchInput } from '../search-input/search-input';
 
 export function Header() {
     const { authorized } = useStore();
@@ -98,6 +99,7 @@ export function Header() {
                             О проекте
                         </Link>
                     </nav>
+                    <SearchInput/>
                 </div>
 
                 <div className='flex items-center gap-2'>
