@@ -101,8 +101,9 @@ export function LoginForm() {
                                         <SelectItem value='selfEmployed'>
                                             Самозанятый
                                         </SelectItem>
+
                                         <SelectItem value='company'>
-                                            ООО
+                                            ЮрЛицо
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -176,3 +177,4 @@ export function LoginForm() {
         </AuthWrapper>
     );
 }
+

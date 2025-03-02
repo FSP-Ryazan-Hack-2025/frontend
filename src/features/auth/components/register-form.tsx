@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RegisterSchema, type RegisterSchemaType } from '../schemes';
 import { AuthWrapper } from './auth-wrapper';
 import { useRegister } from '../hooks';
-import { ConfirmationCodeModal } from './input-modal';
+import { ConfirmationCodeModal } from './confirmation-code-modal';
 import {
     Button,
     Form,
@@ -24,6 +24,7 @@ import {
 } from '@/shared/ui';
 import { api } from '@/shared/api';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 export function RegisterForm() {
     const [role, setRole] = useState<
@@ -33,6 +34,7 @@ export function RegisterForm() {
     const [isVerificationModalOpen, setIsVerificationModalOpen] =
         useState(false);
     const [formData, setFormData] = useState<RegisterSchemaType | null>(null);
+    const [isRequestingCode, setIsRequestingCode] = useState(false);
 
     const form = useForm<RegisterSchemaType>({
         resolver: zodResolver(RegisterSchema),
@@ -50,6 +52,12 @@ export function RegisterForm() {
                 : {
                       role: role,
                       inn: '',
+                      name: '',
+                      surname: '',
+                      patronymic: '',
+                      passport_series: '',
+                      passport_number: '',
+                      birthday_date: '',
                       password: '',
                       passwordRepeat: ''
                   }
@@ -57,18 +65,44 @@ export function RegisterForm() {
 
     const { mutate, isPending } = useRegister();
 
+    const requestVerificationCode = useCallback(async (email: string) => {
+        setIsRequestingCode(true);
+        try {
+            await api.get(`/user/register/verify_code?email=${email}`);
+            return true;
+        } catch (error) {
+            console.error('Error requesting verification code:', error);
+            if (axios.isAxiosError(error) && error.response?.status === 409) {
+                throw error;
+            }
+            toast.error('Ошибка запроса кода. Попробуйте снова.');
+            return false;
+        } finally {
+            setIsRequestingCode(false);
+        }
+    }, []);
+
     const onSubmit = async (data: RegisterSchemaType) => {
         if (data.role === 'buyer') {
             setFormData(data);
-
             try {
-                await api.get(`/user/register/verify_code?email=${data.email}`);
-                setIsVerificationModalOpen(true);
+                const success = await requestVerificationCode(data.email);
+                if (success) {
+                    setIsVerificationModalOpen(true);
+                }
             } catch (error) {
-                console.log(error);
-                setIsVerificationModalOpen(false);
-                toast.error('Ошибка запроса кода. Попробуйте снова.');
-                form.reset();
+                if (
+                    axios.isAxiosError(error) &&
+                    error.response?.status === 409
+                ) {
+                    toast.error('Пользователь с таким email уже существует');
+                    form.setError('email', {
+                        type: 'manual',
+                        message: 'Пользователь с таким email уже существует'
+                    });
+                } else {
+                    toast.error('Ошибка при регистрации. Попробуйте снова.');
+                }
             }
         } else {
             try {
@@ -77,20 +111,37 @@ export function RegisterForm() {
                         ([key]) => key !== 'passwordRepeat'
                     )
                 ) as Omit<RegisterSchemaType, 'passwordRepeat'>;
-                mutate(obj);
+
+
+                mutate({ data: obj, path: 'seller' });
             } catch (error) {
-                console.log(error);
-                setIsVerificationModalOpen(false);
-                form.reset();
+                if (
+                    axios.isAxiosError(error) &&
+                    error.response?.status === 409
+                ) {
+                    toast.error('Пользователь с такими данными уже существует');
+                    if (data.inn) {
+                        form.setError('inn', {
+                            type: 'manual',
+                            message: 'ИНН уже зарегистрирован в системе'
+                        });
+                    }
+                } else {
+                    console.error('Error registering seller:', error);
+                    toast.error('Ошибка при регистрации. Попробуйте снова.');
+                }
             }
         }
     };
 
     const handleVerifyData = async (code: string) => {
-        if (!formData) return false;
+        if (!formData) {
+            toast.error('Данные формы не найдены');
+            return;
+        }
 
         try {
-            const typedData = formData as {
+            const typedDataBuyer = formData as {
                 role: 'buyer';
                 name: string;
                 surname: string;
@@ -99,24 +150,35 @@ export function RegisterForm() {
                 password: string;
                 passwordRepeat: string;
             };
+
             const response = await api.post(
-                `/user/register/verify_code?email=${typedData.email}&code=${code}`
+                `/user/register/verify_code?email=${typedDataBuyer.email}&code=${code}`
             );
 
             if (response.status === 200) {
                 const obj = Object.fromEntries(
-                    Object.entries(typedData).filter(
+                    Object.entries(typedDataBuyer).filter(
                         ([key]) => key !== 'passwordRepeat'
                     )
                 ) as Omit<RegisterSchemaType, 'passwordRepeat'>;
-                mutate(obj);
+
+                setIsVerificationModalOpen(false);
+                await mutate({ data: obj, path: 'user' });
             }
         } catch (error) {
-            console.log(error);
-            setIsVerificationModalOpen(false);
-            toast.error('Ошибка подтверждения. Попробуйте снова.');
-            form.reset();
+            console.error('Error verifying code:', error);
+            throw error;
         }
+    };
+
+    const handleResendCode = async () => {
+        if (!formData || formData.role !== 'buyer') {
+            toast.error('Данные формы не найдены');
+            return;
+        }
+
+        await requestVerificationCode(formData.email);
+        toast.success('Код отправлен повторно');
     };
 
     return (
@@ -159,14 +221,20 @@ export function RegisterForm() {
                                                   }
                                                 : {
                                                       role: typedValue,
+                                                      name: '',
+                                                      surname: '',
+                                                      patronymic: '',
                                                       inn: '',
+                                                      passport_series: '',
+                                                      passport_number: '',
+                                                      birthday_date: '',
                                                       password: '',
                                                       passwordRepeat: ''
                                                   }
                                         );
                                     }}
                                     defaultValue={field.value}
-                                    disabled={isPending}
+                                    disabled={isPending || isRequestingCode}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -186,6 +254,7 @@ export function RegisterForm() {
                                         <SelectItem value='company'>
                                             ЮрЛицо
                                         </SelectItem>
+
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -193,71 +262,160 @@ export function RegisterForm() {
                         )}
                     />
 
-                    {role === 'buyer' && (
+                    <FormField
+                        control={form.control}
+                        name='name'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Имя</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder='Иван'
+                                        {...field}
+                                        disabled={isPending || isRequestingCode}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name='surname'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Фамилия</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder='Иванов'
+                                        {...field}
+                                        disabled={isPending || isRequestingCode}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name='patronymic'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Отчество</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder='Иванович'
+                                        {...field}
+                                        disabled={isPending || isRequestingCode}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {role === 'buyer' ? (
+                        <FormField
+                            control={form.control}
+                            name='email'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Электронная почта</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder='ivan@mail.ru'
+                                            type='email'
+                                            {...field}
+                                            disabled={
+                                                isPending || isRequestingCode
+                                            }
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    ) : (
                         <>
                             <FormField
                                 control={form.control}
-                                name='name'
+                                name='inn'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Имя</FormLabel>
+                                        <FormLabel>ИНН</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder='Иван'
-                                                disabled={isPending}
+                                                placeholder='Введите ИНН (10 или 12 цифр)'
                                                 {...field}
+                                                disabled={
+                                                    isPending ||
+                                                    isRequestingCode
+                                                }
                                             />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
-                                name='surname'
+                                name='passport_series'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Фамилия</FormLabel>
+                                        <FormLabel>Серия</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder='Иванов'
-                                                disabled={isPending}
+                                                placeholder='0000'
                                                 {...field}
+                                                disabled={
+                                                    isPending ||
+                                                    isRequestingCode
+                                                }
                                             />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
-                                name='patronymic'
+                                name='passport_number'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Отчество</FormLabel>
+                                        <FormLabel>Номер</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder='Иванович'
-                                                disabled={isPending}
+                                                placeholder='000000'
                                                 {...field}
+                                                disabled={
+                                                    isPending ||
+                                                    isRequestingCode
+                                                }
                                             />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
-                                name='email'
+                                name='birthday_date'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Почта</FormLabel>
+                                        <FormLabel>Дата рождения</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder='ivan@example.com'
-                                                type='email'
-                                                disabled={isPending}
+                                                type='date'
                                                 {...field}
+                                                disabled={
+                                                    isPending ||
+                                                    isRequestingCode
+                                                }
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -265,26 +423,6 @@ export function RegisterForm() {
                                 )}
                             />
                         </>
-                    )}
-
-                    {role !== 'buyer' && (
-                        <FormField
-                            control={form.control}
-                            name='inn'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>ИНН</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder='Введите ИНН'
-                                            disabled={isPending}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
                     )}
 
                     <FormField
@@ -297,7 +435,7 @@ export function RegisterForm() {
                                     <Input
                                         placeholder='******'
                                         type='password'
-                                        disabled={isPending}
+                                        disabled={isPending || isRequestingCode}
                                         {...field}
                                     />
                                 </FormControl>
@@ -305,6 +443,7 @@ export function RegisterForm() {
                             </FormItem>
                         )}
                     />
+
                     <FormField
                         control={form.control}
                         name='passwordRepeat'
@@ -315,7 +454,7 @@ export function RegisterForm() {
                                     <Input
                                         placeholder='******'
                                         type='password'
-                                        disabled={isPending}
+                                        disabled={isPending || isRequestingCode}
                                         {...field}
                                     />
                                 </FormControl>
@@ -324,14 +463,25 @@ export function RegisterForm() {
                         )}
                     />
 
-                    <ConfirmationCodeModal
-                        isOpen={isVerificationModalOpen}
-                        onClose={() => setIsVerificationModalOpen(false)}
-                        verify={handleVerifyData}
-                    />
+                    {formData && (
+                        <ConfirmationCodeModal
+                            isOpen={isVerificationModalOpen}
+                            onClose={() => setIsVerificationModalOpen(false)}
+                            verify={handleVerifyData}
+                            email={
+                                formData.role === 'buyer' ? formData.email : ''
+                            }
+                            onResendCode={handleResendCode}
+                        />
+                    )}
 
-                    <Button type='submit' disabled={isPending}>
-                        {isPending ? 'Создание...' : 'Создать аккаунт'}
+                    <Button
+                        type='submit'
+                        disabled={isPending || isRequestingCode}
+                    >
+                        {isPending || isRequestingCode
+                            ? 'Обработка...'
+                            : 'Создать аккаунт'}
                     </Button>
                 </form>
             </Form>
