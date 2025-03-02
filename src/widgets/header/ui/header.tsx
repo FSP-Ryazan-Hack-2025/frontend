@@ -76,13 +76,19 @@ export function Header() {
                         </SheetContent>
                     </Sheet>
 
-                    <Link href='/' className='flex items-center space-x-2'>
-                        <span className='flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground'>
-                            П
-                        </span>
-                        <span className='hidden text-xl font-bold sm:inline-block'>
-                            Проект
-                        </span>
+                    <Link href="/" className="flex items-center space-x-2">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full overflow-hidden">
+                            <img
+                            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo.jpg-jMb4WkTaJyGHV2Zcm1npeus2xGeCp6.jpeg"
+                            alt="Bison Logo"
+                            className="h-full w-full object-cover"
+                            />
+                        </div>
+                        <img
+                            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5.jpg-vMljcEnjWD2stalLHD4EY8ddFxsRp5.jpeg"
+                            alt="BIZON"
+                            className="hidden h-8 sm:block"
+                        />
                     </Link>
 
                     <nav className='ml-6 hidden items-center gap-6 md:flex'>
@@ -98,8 +104,9 @@ export function Header() {
                         >
                             О проекте
                         </Link>
+                        <SearchInput/>
                     </nav>
-                    <SearchInput/>
+                    
                 </div>
 
                 <div className='flex items-center gap-2'>

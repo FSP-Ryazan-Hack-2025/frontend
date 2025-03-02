@@ -42,7 +42,7 @@ const generateProducts = async (): Promise<Product[]> => {
     return products
   } catch (error) {
     console.error("Error fetching data:", error)
-    throw error
+    return [] // Return empty array instead of throwing error
   }
 }
 
@@ -79,14 +79,10 @@ export default function Home() {
     let filtered = [...products]
 
     // Фильтр по цене
-    filtered = filtered.filter(
-      (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
-    )
+    filtered = filtered.filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
 
     // Фильтр по количеству
-    filtered = filtered.filter(
-      (product) => product.count >= quantityRange[0] && product.count <= quantityRange[1]
-    )
+    filtered = filtered.filter((product) => product.count >= quantityRange[0] && product.count <= quantityRange[1])
 
     // Фильтр по категориям
     if (selectedCategories.length > 0) {
@@ -146,13 +142,7 @@ export default function Home() {
       <div>
         <h3 className="font-medium mb-2">Цена</h3>
         <div className="space-y-4">
-          <Slider
-            value={priceRange}
-            min={0}
-            max={10000}
-            step={100}
-            onValueChange={handlePriceRangeChange}
-          />
+          <Slider value={priceRange} min={0} max={10000} step={100} onValueChange={handlePriceRangeChange} />
           <div className="flex justify-between text-sm">
             <span>{priceRange[0]} ₽</span>
             <span>{priceRange[1]} ₽</span>
@@ -165,13 +155,7 @@ export default function Home() {
       <div>
         <h3 className="font-medium mb-2">Количество</h3>
         <div className="space-y-4">
-          <Slider
-            value={quantityRange}
-            min={0}
-            max={50}
-            step={1}
-            onValueChange={handleQuantityRangeChange}
-          />
+          <Slider value={quantityRange} min={0} max={50} step={1} onValueChange={handleQuantityRangeChange} />
           <div className="flex justify-between text-sm">
             <span>{quantityRange[0]} шт.</span>
             <span>{quantityRange[1]} шт.</span>
@@ -285,26 +269,29 @@ export default function Home() {
 
             {/* Сетка товаров */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              <AnimatePresence>
+              <AnimatePresence mode="wait">
                 {filteredProducts.map((product, index) => (
                   <motion.div
                     key={product.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
+                    exit={{ opacity: 0, y: -20 }}
                     transition={{
                       duration: 0.3,
-                      delay: index * 0.05,
+                      delay: (index * 0.05) % 0.5, // Limit delay to prevent too long animations
                       type: "spring",
                       stiffness: 100,
+                      damping: 15,
                     }}
+                    layout
                     whileHover={{ y: -5 }}
                     className="bg-card rounded-lg overflow-hidden border shadow-sm"
                   >
+                    {/* Keep the existing product content */}
                     <Link href={`/products/${product.id}`} className="block">
                       <div className="aspect-square relative overflow-hidden bg-muted">
                         <img
-                          src={product.image}
+                          src={`https://api-hack.energy-cerber.ru/static/product_images/${product.id}.webp`}
                           alt={product.name}
                           className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                         />
